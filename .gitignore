@@ -1,5 +1,3 @@
-*.out
-*.o
-*.exe
+main
 build/
 .vscode/
