@@ -181,61 +181,122 @@ void medie_pixeli(unsigned char ***img, int N, int M)
 
 void completare(unsigned char ****img_adress, int *N_adress, int *M_adress)
 {
-    int marime_margine = (*M_adress - *N_adress) / 2;
+    if(*N_adress < *M_adress)
+    {
+        int marime_margine = (*M_adress - *N_adress) / 2;
     
-    unsigned char ***img_comp = malloc(*M_adress * sizeof(unsigned char **));
+        unsigned char ***img_comp = malloc(*M_adress * sizeof(unsigned char **));
 
-    if(img_comp == NULL)
-    {
-        printf(";-;");
-        return;
-    }
-
-    for(int i = 0; i < *M_adress; i++)
-    {
-        img_comp[i] = malloc(*M_adress * sizeof(unsigned char *));
-
-        if(img_comp[i] == NULL)
+        if(img_comp == NULL)
         {
-            printf("nu mai vreau..");
+            printf(";-;");
             return;
         }
 
-        for(int j = 0; j < *M_adress; j++)
+        for(int i = 0; i < *M_adress; i++)
         {
-            img_comp[i][j] = malloc(3 * sizeof(unsigned char));
-            if(img_comp[i][j] == NULL)
+            img_comp[i] = malloc(*M_adress * sizeof(unsigned char *));
+
+            if(img_comp[i] == NULL)
             {
-                printf("bruh");
+                printf("nu mai vreau..");
                 return;
             }
 
-            if(i < marime_margine || i >= *N_adress + marime_margine)
+            for(int j = 0; j < *M_adress; j++)
             {
-                img_comp[i][j][0] = 255;
-                img_comp[i][j][1] = 255;
-                img_comp[i][j][2] = 255;
-            }
-            else
-            {
-                img_comp[i][j][0] = (*img_adress)[i-marime_margine][j][0];
-                img_comp[i][j][1] = (*img_adress)[i-marime_margine][j][1];
-                img_comp[i][j][2] = (*img_adress)[i-marime_margine][j][2];
+                img_comp[i][j] = malloc(3 * sizeof(unsigned char));
+                if(img_comp[i][j] == NULL)
+                {
+                    printf("bruh");
+                    return;
+                }
+
+                if(i < marime_margine || i >= *N_adress + marime_margine)
+                {
+                    img_comp[i][j][0] = 255;
+                    img_comp[i][j][1] = 255;
+                    img_comp[i][j][2] = 255;
+                }
+                else
+                {
+                    img_comp[i][j][0] = (*img_adress)[i-marime_margine][j][0];
+                    img_comp[i][j][1] = (*img_adress)[i-marime_margine][j][1];
+                    img_comp[i][j][2] = (*img_adress)[i-marime_margine][j][2];
+                }
             }
         }
-    }
 
-    for(int i = 0; i < *N_adress; i++)
+        for(int i = 0; i < *N_adress; i++)
+        {
+            for(int j = 0; j < *M_adress; j++)
+                free((*img_adress)[i][j]);
+            free((*img_adress)[i]);
+        }
+        free(*img_adress);
+
+        *N_adress = *M_adress;
+
+        *img_adress = img_comp;
+    }
+    else
     {
-        for(int j = 0; j < *M_adress; j++)
-            free((*img_adress)[i][j]);
-        free((*img_adress)[i]);
+        int marime_margine = (*N_adress - *M_adress) / 2;
+        
+        unsigned char ***img_comp = malloc(*N_adress * sizeof(unsigned char **));
+
+        if(img_comp == NULL)
+        {
+            printf(";-;");
+            return;
+        }
+
+        for(int i = 0; i < *N_adress; i++)
+        {
+            img_comp[i] = malloc(*N_adress * sizeof(unsigned char *));
+
+            if(img_comp[i] == NULL)
+            {
+                printf("nu mai vreau..");
+                return;
+            }
+
+            for(int j = 0; j < *N_adress; j++)
+            {
+                img_comp[i][j] = malloc(3 * sizeof(unsigned char));
+                if(img_comp[i][j] == NULL)
+                {
+                    printf("bruh");
+                    return;
+                }
+
+                if(i < marime_margine || i >= *M_adress + marime_margine)
+                {
+                    img_comp[i][j][0] = 255;
+                    img_comp[i][j][1] = 255;
+                    img_comp[i][j][2] = 255;
+                }
+                else
+                {
+                    img_comp[i][j][0] = (*img_adress)[i][j - marime_margine][0];
+                    img_comp[i][j][1] = (*img_adress)[i][j - marime_margine][1];
+                    img_comp[i][j][2] = (*img_adress)[i][j - marime_margine][2];
+                }
+            }
+        }
+
+        for(int i = 0; i < *N_adress; i++)
+        {
+            for(int j = 0; j < *M_adress; j++)
+                free((*img_adress)[i][j]);
+            free((*img_adress)[i]);
+        }
+        free(*img_adress);
+
+        *M_adress = *N_adress;
+
+        *img_adress = img_comp;
     }
-    free(*img_adress);
-
-    *N_adress = *M_adress;
-
-    *img_adress = img_comp;
 }
 
 int main(void)
